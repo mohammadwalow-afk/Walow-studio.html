@@ -1,0 +1,742 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0a0a0a">
+<title>Walow Creator Studio</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<style>
+:root{--bg:#0a0a0a;--panel:#141414;--panel2:#1b1b1b;--line:#272727;--gold:#d4af37;--gold2:#a87f0c;--txt:#ececec;--mut:#8b8b8b;--err:#ff6b5e;--ok:#7bd88f}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--txt);font-family:system-ui,-apple-system,"Segoe UI","Noto Sans Arabic",Tahoma,sans-serif;font-size:16px;line-height:1.6}
+[hidden]{display:none!important}
+body{padding-block:16px 28px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:720px;margin:0 auto}
+header{text-align:center;padding:14px 0 12px;border-bottom:1px solid var(--line);margin-bottom:16px;position:relative}
+h1{margin:0;font-size:clamp(1.5rem,7vw,2.2rem);letter-spacing:.04em;color:var(--gold);line-height:1.25;text-wrap:balance}
+.sub{margin:6px 0 0;color:var(--mut);font-size:.92rem}
+.tools{display:flex;gap:8px;justify-content:center;margin-top:12px;flex-wrap:wrap}
+.chip{background:var(--panel2);color:var(--txt);border:1px solid var(--line);border-radius:999px;padding:7px 14px;font:inherit;font-size:.88rem;cursor:pointer}
+.chip:focus-visible,button:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:18px}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.tab{background:var(--panel2);color:var(--txt);border:1px solid var(--line);border-radius:14px;padding:12px 6px;font:inherit;font-size:.95rem;cursor:pointer;line-height:1.35;min-height:62px}
+.tab[aria-selected=true]{background:var(--gold);border-color:var(--gold);color:#111;font-weight:700}
+label.l{display:block;margin:6px 0 8px;font-size:.98rem}
+textarea,select,input[type=number],input[type=password]{width:100%;background:var(--panel2);color:var(--txt);border:1px solid var(--line);border-radius:14px;padding:12px 14px;font:inherit}
+textarea{min-height:130px;resize:vertical}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:12px 0}
+.opts label{font-size:.82rem;color:var(--mut);display:flex;flex-direction:column;gap:4px;min-width:0}
+.vfx{display:flex;align-items:center;gap:12px;background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin:12px 0;cursor:pointer}
+.vfx input{width:24px;height:24px;accent-color:var(--gold);flex:none}
+.go{width:100%;border:0;border-radius:16px;padding:16px;font:inherit;font-size:1.08rem;font-weight:700;color:#141000;background:linear-gradient(135deg,var(--gold),var(--gold2));cursor:pointer}
+.go:disabled{opacity:.55}
+.cancel{width:100%;margin-top:8px;background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:14px;padding:11px;font:inherit;cursor:pointer}
+.status{min-height:1.6em;margin:12px 0 0;color:var(--mut);font-size:.92rem;text-align:center}
+.status.err{color:var(--err)}
+.strip{display:flex;gap:8px;overflow-x:auto;padding:4px 0 8px}
+.strip button{flex:none;width:68px;height:68px;border-radius:12px;border:2px solid var(--line);padding:0;background:#000;overflow:hidden;cursor:pointer}
+.strip button[aria-pressed=true]{border-color:var(--gold)}
+.strip img{width:100%;height:100%;object-fit:cover;display:block}
+.up{display:inline-block;margin:2px 0 4px}
+hr{border:0;border-top:1px solid var(--line);margin:20px 0}
+.rh{color:var(--gold);font-size:1.05rem;margin:0 0 12px;font-weight:600}
+.pane{border:1px dashed #333;border-radius:16px;background:#070707;padding:12px;min-height:200px}
+.empty{color:var(--mut);text-align:center;margin:56px 12px;font-size:.95rem}
+.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.gc{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden;min-width:0}
+.gc img{display:block;width:100%;aspect-ratio:1/1;object-fit:cover;background:#000}
+.gc .cap{font-size:.76rem;color:var(--mut);padding:6px 8px 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gc .acts{display:flex;gap:6px;padding:8px}
+.gc .acts button{flex:1;background:var(--panel2);border:1px solid var(--line);color:var(--txt);border-radius:9px;padding:6px 2px;font:inherit;font-size:.78rem;cursor:pointer}
+.vwrap{position:relative;border-radius:14px;overflow:hidden;background:#0b0b0b}
+#cv3d,#cvVid{display:block;width:100%;touch-action:none;background:#0b0b0b}
+#cvVid{height:auto;border-radius:14px}
+.wm{position:absolute;left:10px;bottom:8px;font-size:.7rem;color:var(--gold);opacity:.85;pointer-events:none;direction:ltr;text-shadow:0 1px 3px #000}
+.ctrls{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:12px;font-size:.85rem;color:var(--mut)}
+.ctrls label{display:flex;flex-direction:column;gap:4px}
+.ctrls input[type=range]{width:100%;accent-color:var(--gold)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.row button{flex:1 1 120px;background:var(--panel2);border:1px solid var(--line);color:var(--txt);border-radius:12px;padding:10px;font:inherit;font-size:.9rem;cursor:pointer}
+video{display:block;width:100%;border-radius:14px;background:#000}
+.meta{margin:12px 2px 0;color:#666;font-size:.76rem;direction:ltr;text-align:left}
+#copy{text-align:center;color:#6a6a6a;font-size:.85rem;margin-top:22px}
+#lock{position:fixed;inset:0;z-index:50;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:24px}
+#lock .box{width:100%;max-width:360px;text-align:center;display:flex;flex-direction:column;gap:12px}
+.pwp{margin-top:12px;display:flex;flex-direction:column;gap:8px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:max(24px,env(safe-area-inset-bottom,0px));background:var(--gold);color:#111;border-radius:999px;padding:10px 18px;font-size:.9rem;z-index:60;max-width:90vw}
+.note{color:var(--mut);font-size:.8rem;margin:6px 0 0}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js" defer></script>
+</head>
+<body>
+
+<div id="lock" hidden>
+  <div class="box">
+    <h1>WALOW STUDIO</h1>
+    <p class="sub">أدخل كلمة المرور للدخول</p>
+    <input id="lockPw" type="password" autocomplete="current-password" placeholder="كلمة المرور">
+    <label class="vfx" style="margin:0"><input id="lockRem" type="checkbox" checked><span>تذكرني على هذا الجهاز</span></label>
+    <button class="go" id="lockGo" type="button">دخول</button>
+    <p class="status err" id="lockMsg"></p>
+  </div>
+</div>
+
+<div class="wrap">
+  <header>
+    <h1>WALOW CREATOR STUDIO 🎬</h1>
+    <p class="sub">استوديو الصور والفيديو السينمائي والـ 3D</p>
+    <div class="tools">
+      <button class="chip" id="btnShare" type="button">مشاركة مع الأصدقاء</button>
+      <button class="chip" id="btnInstall" type="button" hidden>تثبيت على الشاشة</button>
+      <button class="chip" id="btnPw" type="button">🔒 كلمة المرور</button>
+    </div>
+    <div class="pwp" id="pwPanel" hidden>
+      <input id="newPw" type="password" autocomplete="new-password" placeholder="كلمة مرور جديدة (4 أحرف على الأقل)">
+      <div class="row" style="margin:0">
+        <button type="button" id="pwSave">حفظ كلمة المرور</button>
+        <button type="button" id="pwRemove">إزالة القفل</button>
+      </div>
+      <p class="note" id="pwMsg">القفل يعمل على هذا الجهاز فقط، ويمنع الدخول العادي للتطبيق.</p>
+    </div>
+  </header>
+
+  <main class="card">
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" aria-selected="true" data-tab="img" type="button">🖼️ صور الذكاء الاصطناعي</button>
+      <button class="tab" role="tab" aria-selected="false" data-tab="3d" type="button">🧊 تحويل إلى 3D</button>
+      <button class="tab" role="tab" aria-selected="false" data-tab="vid" type="button">🎞️ فيديو سينمائي</button>
+    </div>
+
+    <label class="l" for="prompt">الوصف النصي للفكرة (Prompt):</label>
+    <textarea id="prompt" placeholder="اكتب وصفك التخيلي بالتفصيل هنا..."></textarea>
+
+    <div class="opts" data-for="img">
+      <label>النمط
+        <select id="style">
+          <option value="none">بدون</option>
+          <option value="cine" selected>سينمائي</option>
+          <option value="real">واقعي</option>
+          <option value="anime">أنمي</option>
+          <option value="d3">ثلاثي الأبعاد</option>
+          <option value="art">رسم فني</option>
+        </select>
+      </label>
+      <label>الأبعاد
+        <select id="ratio">
+          <option value="1:1">مربع 1:1</option>
+          <option value="9:16">طولي 9:16</option>
+          <option value="16:9">عرضي 16:9</option>
+          <option value="3:4">3:4</option>
+        </select>
+      </label>
+      <label>عدد الصور
+        <input id="count" type="number" min="1" max="50" value="1" inputmode="numeric">
+      </label>
+    </div>
+
+    <div class="opts" data-for="vid" hidden>
+      <label>حركة الكاميرا
+        <select id="motion">
+          <option value="in">تقريب</option>
+          <option value="out">ابتعاد</option>
+          <option value="right">تحريك يميناً</option>
+          <option value="left">تحريك يساراً</option>
+          <option value="orbit">دوران خفيف</option>
+          <option value="shake">كاميرا محمولة</option>
+        </select>
+      </label>
+      <label>المدة
+        <select id="dur">
+          <option value="4">4 ثوانٍ</option>
+          <option value="6" selected>6 ثوانٍ</option>
+          <option value="10">10 ثوانٍ</option>
+          <option value="15">15 ثانية</option>
+        </select>
+      </label>
+    </div>
+
+    <div id="srcBox" hidden>
+      <label class="l">المصدر: اختر صورة من نتائجك أو ارفع صورة، أو اكتب وصفاً لتُولَّد صورة تلقائياً</label>
+      <div class="strip" id="strip"></div>
+      <label class="chip up" for="upload">رفع صورة من الجهاز</label>
+      <input id="upload" type="file" accept="image/*" hidden>
+    </div>
+
+    <label class="vfx" for="vfx">
+      <input id="vfx" type="checkbox">
+      <span>إضافة مؤثرات بصرية سينمائية (VFX / تفجيرات / إضاءة درامية / حركة كاميرا)</span>
+    </label>
+
+    <button class="go" id="go" type="button">⚡ بدء المعالجة والتوليد الفوري</button>
+    <button class="cancel" id="cancel" type="button" hidden>إيقاف</button>
+    <p class="status" id="status" role="status"></p>
+
+    <hr>
+    <h2 class="rh">معرض النتائج وبصمة الحقوق:</h2>
+
+    <section class="pane" id="pImg">
+      <div class="gallery" id="gallery"></div>
+      <p class="empty" id="emptyImg">النتيجة تظهر هنا فور اكتمال التوليد...</p>
+    </section>
+
+    <section class="pane" id="p3d" hidden>
+      <p class="empty" id="empty3d">اختر صورة ثم اضغط بدء المعالجة. تتحول الصورة إلى مجسّم بارز تستطيع تدويره بإصبعك.</p>
+      <div id="v3d" hidden>
+        <div class="vwrap"><canvas id="cv3d"></canvas><span class="wm" id="wm3d"></span></div>
+        <div class="ctrls">
+          <label>قوة العمق <input id="depth" type="range" min="0" max="0.9" step="0.01" value="0.35"></label>
+          <label><span><input id="inv" type="checkbox"> عكس العمق</span><span><input id="auto" type="checkbox" checked> حركة تلقائية</span></label>
+        </div>
+        <div class="row">
+          <button type="button" id="snap">حفظ لقطة PNG</button>
+          <button type="button" id="expPly">تصدير PLY</button>
+          <button type="button" id="expObj">تصدير OBJ</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="pane" id="pVid" hidden>
+      <p class="empty" id="emptyVid">اختر صورة أو اكتب وصفاً ثم اضغط بدء المعالجة. يُصوَّر الفيديو داخل جهازك.</p>
+      <canvas id="cvVid" hidden></canvas>
+      <div id="vidDone" hidden>
+        <video id="vidOut" controls playsinline></video>
+        <div class="row"><button type="button" id="vidDl">تحميل الفيديو</button></div>
+      </div>
+    </section>
+
+    <p class="meta">Metadata: [Created by Mohammad Walow Abu Yousef | Walow Creator Studio v2.0]</p>
+  </main>
+
+  <p id="copy">صُنع وبُرمج بواسطة <b>محمد ولو أبو يوسف</b> - جميع الحقوق محفوظة © 2026</p>
+</div>
+
+<script>
+(() => {
+'use strict';
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const OWNER = 'محمد ولو أبو يوسف';
+const WM = 'WALOW STUDIO © ' + OWNER;
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+
+/* ---------- تخزين آمن ---------- */
+const mk = st => ({
+  get: k => { try { return st.getItem(k); } catch (e) { return null; } },
+  set: (k, v) => { try { st.setItem(k, v); } catch (e) {} },
+  del: k => { try { st.removeItem(k); } catch (e) {} }
+});
+const ls = mk(window.localStorage || {}), ss = mk(window.sessionStorage || {});
+
+function toast(msg) {
+  const t = document.createElement('div');
+  t.className = 'toast'; t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2800);
+}
+function download(blob, name) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 4000);
+}
+
+/* ---------- قفل كلمة المرور ---------- */
+const PWK = 'wl_pw', OKK = 'wl_ok';
+async function sha(s) {
+  try {
+    const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode('walow|' + s));
+    return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, '0')).join('');
+  } catch (e) {
+    let h = 5381; for (const c of 'walow|' + s) h = ((h << 5) + h + c.charCodeAt(0)) >>> 0;
+    return 'x' + h;
+  }
+}
+function checkLock() {
+  const pw = ls.get(PWK);
+  $('#lock').hidden = !(pw && ls.get(OKK) !== pw && ss.get(OKK) !== pw);
+}
+$('#lockGo').onclick = async () => {
+  const pw = ls.get(PWK), h = await sha($('#lockPw').value);
+  if (h === pw) {
+    ($('#lockRem').checked ? ls : ss).set(OKK, pw);
+    $('#lockPw').value = ''; $('#lockMsg').textContent = ''; $('#lock').hidden = true;
+  } else $('#lockMsg').textContent = 'كلمة المرور غير صحيحة.';
+};
+$('#lockPw').addEventListener('keydown', e => { if (e.key === 'Enter') $('#lockGo').click(); });
+$('#btnPw').onclick = () => { $('#pwPanel').hidden = !$('#pwPanel').hidden; };
+$('#pwSave').onclick = async () => {
+  const v = $('#newPw').value;
+  if (v.length < 4) { $('#pwMsg').textContent = 'كلمة المرور قصيرة، اكتب 4 أحرف على الأقل.'; return; }
+  const h = await sha(v);
+  ls.set(PWK, h); ls.del(OKK); ss.set(OKK, h);
+  $('#newPw').value = ''; $('#pwMsg').textContent = 'تم حفظ كلمة المرور على هذا الجهاز.';
+};
+$('#pwRemove').onclick = () => {
+  ls.del(PWK); ls.del(OKK); ss.del(OKK);
+  $('#pwMsg').textContent = 'تمت إزالة القفل.';
+};
+checkLock();
+
+/* ---------- مشاركة وتثبيت ---------- */
+let dip = null;
+addEventListener('beforeinstallprompt', e => { e.preventDefault(); dip = e; $('#btnInstall').hidden = false; });
+$('#btnInstall').onclick = async () => {
+  if (!dip) return;
+  dip.prompt(); try { await dip.userChoice; } catch (e) {}
+  dip = null; $('#btnInstall').hidden = true;
+};
+$('#btnShare').onclick = async () => {
+  const url = /^https?:/.test(location.protocol) ? location.href.split('#')[0] : '';
+  if (!url) { toast('للمشاركة برابط، انشر التطبيق على استضافة مجانية أولاً.'); return; }
+  const data = { title: 'Walow Creator Studio', text: 'استوديو والو للصور والفيديو والـ 3D. من صنع ' + OWNER, url };
+  try { if (navigator.share) { await navigator.share(data); return; } } catch (e) { if (e.name === 'AbortError') return; }
+  try { await navigator.clipboard.writeText(url); toast('تم نسخ الرابط'); }
+  catch (e) { toast('انسخ الرابط من شريط العنوان'); }
+};
+if ('serviceWorker' in navigator && /^https?:/.test(location.protocol)) navigator.serviceWorker.register('sw.js').catch(() => {});
+
+/* ---------- حالة عامة ---------- */
+const store = [];
+let tab = 'img', busy = false, cancelFlag = false, ctl = null, nid = 1;
+const sel = { '3d': null, vid: null };
+
+function setStatus(msg, err) { const s = $('#status'); s.textContent = msg || ''; s.className = 'status' + (err ? ' err' : ''); }
+function niceErr(e) {
+  if (cancelFlag || e.message === 'cancel') return 'تم الإيقاف.';
+  if (e.name === 'AbortError') return 'انتهت مهلة الاتصال بالخدمة. أعد المحاولة.';
+  if (e.status === 429) return 'الخدمة المجانية مشغولة حالياً. انتظر دقيقة ثم أعد المحاولة.';
+  if (e.status === 401 || e.status === 403) return 'الخدمة رفضت هذا الطلب. جرّب وصفاً مختلفاً أو أعد المحاولة لاحقاً.';
+  if (e instanceof TypeError) return 'تعذّر الاتصال بالإنترنت أو بالخدمة.';
+  return e.message || 'حدث خطأ غير متوقع.';
+}
+
+/* ---------- التبويبات ---------- */
+function switchTab(t) {
+  tab = t;
+  $$('.tab').forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === t)));
+  $$('.opts').forEach(o => { o.hidden = o.dataset.for !== t; });
+  $('#srcBox').hidden = t === 'img';
+  $('#pImg').hidden = t !== 'img';
+  $('#p3d').hidden = t !== '3d';
+  $('#pVid').hidden = t !== 'vid';
+  renderStrip();
+  if (t === '3d' && T) resize3D();
+}
+$$('.tab').forEach(b => b.onclick = () => switchTab(b.dataset.tab));
+
+/* ---------- ختم الحقوق ---------- */
+function stampCtx(ctx, W, H) {
+  const fs = Math.max(13, Math.round(Math.min(W, H) * 0.022)), m = Math.round(fs * 0.8);
+  ctx.save();
+  ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 0.88;
+  ctx.font = '600 ' + fs + 'px system-ui,"Noto Sans Arabic",sans-serif';
+  ctx.textBaseline = 'bottom'; ctx.textAlign = 'right';
+  ctx.shadowColor = 'rgba(0,0,0,.85)'; ctx.shadowBlur = 4;
+  ctx.fillStyle = '#d4af37';
+  ctx.fillText(WM, W - m, H - m);
+  ctx.restore();
+}
+
+/* ---------- توليد الصور ---------- */
+const STYLES = {
+  none: '',
+  cine: ', cinematic film still, dramatic lighting, shallow depth of field, 35mm',
+  real: ', photorealistic, ultra detailed, natural light, 8k',
+  anime: ', anime style, vibrant colors, detailed illustration',
+  d3: ', 3d render, soft studio lighting, high detail',
+  art: ', digital painting, concept art, intricate details'
+};
+const VFXP = ', epic visual effects, dramatic volumetric lighting, lens flare, sparks, smoke, dynamic camera angle, glowing explosion light';
+const SIZES = { '1:1': [1024, 1024], '9:16': [768, 1344], '16:9': [1344, 768], '3:4': [896, 1152] };
+
+async function toEnglish(p) {
+  if (!/[؀-ۿ]/.test(p)) return p;
+  const c = new AbortController(), t = setTimeout(() => c.abort(), 9000);
+  try {
+    const q = 'Translate this to English for an image generation prompt. Reply with the translation only: ' + p;
+    const r = await fetch('https://text.pollinations.ai/' + encodeURIComponent(q), { signal: c.signal });
+    if (!r.ok) return p;
+    const tx = (await r.text()).trim();
+    return tx && tx.length < 1500 ? tx : p;
+  } catch (e) { return p; } finally { clearTimeout(t); }
+}
+async function fetchBlob(url, ms = 100000) {
+  const to = setTimeout(() => ctl && ctl.abort(), ms);
+  try {
+    const r = await fetch(url, { signal: ctl.signal });
+    if (!r.ok) { const e = new Error('HTTP ' + r.status); e.status = r.status; throw e; }
+    const b = await r.blob();
+    if (!/^image\//.test(b.type)) throw new Error('رد غير صالح من الخدمة.');
+    return b;
+  } finally { clearTimeout(to); }
+}
+async function addItem(raw, label) {
+  const bmp = await createImageBitmap(raw);
+  const c = document.createElement('canvas'); c.width = bmp.width; c.height = bmp.height;
+  const x = c.getContext('2d'); x.drawImage(bmp, 0, 0); stampCtx(x, c.width, c.height);
+  const blob = await new Promise(r => c.toBlob(r, 'image/jpeg', 0.92));
+  const item = { id: nid++, raw, blob, url: URL.createObjectURL(blob), w: bmp.width, h: bmp.height, label };
+  store.unshift(item);
+  renderGallery(); renderStrip();
+  return item;
+}
+async function genImage(prompt, o) {
+  const en = await toEnglish(prompt);
+  const [w, h] = SIZES[o.ratio] || SIZES['1:1'];
+  const full = en + (STYLES[o.style] || '') + (o.vfx ? VFXP : '');
+  let blob, last;
+  for (let a = 0; a < 3 && !blob; a++) {
+    if (cancelFlag) throw new Error('cancel');
+    const seed = Math.floor(Math.random() * 1e9);
+    const url = 'https://image.pollinations.ai/prompt/' + encodeURIComponent(full) +
+      '?width=' + w + '&height=' + h + '&seed=' + seed + '&nologo=true&model=flux';
+    try { blob = await fetchBlob(url); } catch (e) { last = e; if (cancelFlag) throw e; await sleep(2500 * (a + 1)); }
+  }
+  if (!blob) throw last || new Error('فشل التوليد.');
+  return addItem(blob, prompt);
+}
+
+/* ---------- المعرض والمصادر ---------- */
+function renderGallery() {
+  const g = $('#gallery'); g.textContent = '';
+  $('#emptyImg').hidden = store.length > 0;
+  for (const it of store) {
+    const d = document.createElement('div'); d.className = 'gc';
+    const im = document.createElement('img'); im.src = it.url; im.alt = it.label; im.loading = 'lazy';
+    const cap = document.createElement('div'); cap.className = 'cap'; cap.textContent = it.label;
+    const acts = document.createElement('div'); acts.className = 'acts';
+    [['dl', 'تحميل'], ['3d', '3D'], ['vid', 'فيديو']].forEach(([a, t]) => {
+      const b = document.createElement('button'); b.type = 'button'; b.dataset.act = a; b.dataset.id = it.id; b.textContent = t; acts.appendChild(b);
+    });
+    d.append(im, cap, acts); g.appendChild(d);
+  }
+}
+$('#gallery').addEventListener('click', e => {
+  const b = e.target.closest('button[data-act]'); if (!b) return;
+  const it = store.find(x => x.id === +b.dataset.id); if (!it) return;
+  if (b.dataset.act === 'dl') download(it.blob, 'walow-' + it.id + '.jpg');
+  else { sel[b.dataset.act] = it; switchTab(b.dataset.act); run(); }
+});
+function renderStrip() {
+  const s = $('#strip'); s.textContent = '';
+  if (tab === 'img') return;
+  for (const it of store) {
+    const b = document.createElement('button'); b.type = 'button';
+    b.setAttribute('aria-pressed', String(sel[tab] === it)); b.setAttribute('aria-label', it.label);
+    const im = document.createElement('img'); im.src = it.url; im.alt = '';
+    b.appendChild(im);
+    b.onclick = () => { sel[tab] = sel[tab] === it ? null : it; renderStrip(); };
+    s.appendChild(b);
+  }
+}
+$('#upload').addEventListener('change', async e => {
+  const f = e.target.files && e.target.files[0]; e.target.value = '';
+  if (!f) return;
+  try { const it = await addItem(f, 'صورة مرفوعة'); sel[tab === 'img' ? '3d' : tab] = it; renderStrip(); }
+  catch (err) { setStatus('تعذّر قراءة هذه الصورة.', true); }
+});
+
+/* ---------- تحويل 3D (نحت بارز داخل الجهاز) ---------- */
+let T = null;
+function ensureThree() {
+  if (typeof THREE === 'undefined') throw new Error('تعذّر تحميل مكتبة الـ 3D. تحقق من الإنترنت ثم أعد المحاولة.');
+  if (T) return T;
+  const cv = $('#cv3d');
+  const renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true, preserveDrawingBuffer: true });
+  renderer.setClearColor(0x0b0b0b, 1);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.outputEncoding = THREE.sRGBEncoding;
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 50);
+  scene.add(new THREE.AmbientLight(0xffffff, 0.9));
+  const dl = new THREE.DirectionalLight(0xffffff, 0.55); dl.position.set(1.5, 2, 3); scene.add(dl);
+  const group = new THREE.Group(); scene.add(group);
+  T = { renderer, scene, camera, group, mesh: null, st: null, rx: 0, ry: 0, dist: 4.4, auto: true, ptrs: new Map(), pinch: 0 };
+  resize3D();
+  new ResizeObserver(resize3D).observe(cv.parentElement);
+  cv.addEventListener('pointerdown', e => { cv.setPointerCapture(e.pointerId); T.ptrs.set(e.pointerId, [e.clientX, e.clientY]); });
+  const up = e => { T.ptrs.delete(e.pointerId); T.pinch = 0; };
+  cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
+  cv.addEventListener('pointermove', e => {
+    const p = T.ptrs.get(e.pointerId); if (!p) return;
+    const pts = [...T.ptrs.values()];
+    if (pts.length === 2) {
+      const d = Math.hypot(pts[0][0] - pts[1][0], pts[0][1] - pts[1][1]);
+      if (T.pinch) T.dist = clamp(T.dist * (T.pinch / d), 2, 9);
+      T.pinch = d;
+      T.ptrs.set(e.pointerId, [e.clientX, e.clientY]);
+    } else {
+      T.ry += (e.clientX - p[0]) * 0.008; T.rx = clamp(T.rx + (e.clientY - p[1]) * 0.008, -1.2, 1.2);
+      T.ptrs.set(e.pointerId, [e.clientX, e.clientY]);
+    }
+  });
+  cv.addEventListener('wheel', e => { e.preventDefault(); T.dist = clamp(T.dist * (1 + e.deltaY * 0.001), 2, 9); }, { passive: false });
+  const tick = now => {
+    requestAnimationFrame(tick);
+    if (tab !== '3d' || !T.mesh) return;
+    group.rotation.x = T.rx;
+    group.rotation.y = T.ry + (T.auto && !T.ptrs.size ? Math.sin(now / 1100) * 0.45 : 0);
+    camera.position.set(0, 0, T.dist);
+    renderer.render(scene, camera);
+  };
+  requestAnimationFrame(tick);
+  return T;
+}
+function resize3D() {
+  if (!T) return;
+  const cv = $('#cv3d'), w = cv.parentElement.clientWidth; if (!w) return;
+  const h = Math.round(w * 0.95);
+  T.renderer.setSize(w, h, false); cv.style.height = h + 'px';
+  T.camera.aspect = w / h; T.camera.updateProjectionMatrix();
+}
+function blur3(src, w, h) {
+  const out = new Float32Array(src.length);
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+    let s = 0, n = 0;
+    for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
+      const xx = x + dx, yy = y + dy;
+      if (xx >= 0 && yy >= 0 && xx < w && yy < h) { s += src[yy * w + xx]; n++; }
+    }
+    out[y * w + x] = s / n;
+  }
+  return out;
+}
+async function build3D(item) {
+  const t = ensureThree();
+  const bmp = await createImageBitmap(item.raw);
+  const aspect = bmp.width / bmp.height, G = 190;
+  const sw = aspect >= 1 ? G : Math.max(40, Math.round(G * aspect));
+  const sh = aspect >= 1 ? Math.max(40, Math.round(G / aspect)) : G;
+  const vw = sw + 1, vh = sh + 1, nv = vw * vh;
+  const c = document.createElement('canvas'); c.width = vw; c.height = vh;
+  const x = c.getContext('2d', { willReadFrequently: true });
+  x.drawImage(bmp, 0, 0, vw, vh);
+  const d = x.getImageData(0, 0, vw, vh).data;
+  let lum = new Float32Array(nv); const col = new Float32Array(nv * 3);
+  for (let i = 0; i < nv; i++) {
+    const r = d[i * 4], g = d[i * 4 + 1], b = d[i * 4 + 2];
+    lum[i] = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    col[i * 3] = r / 255; col[i * 3 + 1] = g / 255; col[i * 3 + 2] = b / 255;
+  }
+  lum = blur3(blur3(lum, vw, vh), vw, vh);
+  let mn = 1, mx = 0; for (let i = 0; i < nv; i++) { if (lum[i] < mn) mn = lum[i]; if (lum[i] > mx) mx = lum[i]; }
+  const span = mx - mn || 1; for (let i = 0; i < nv; i++) lum[i] = (lum[i] - mn) / span;
+  const W = aspect >= 1 ? 2 : 2 * aspect, H = aspect >= 1 ? 2 / aspect : 2;
+  const pos = new Float32Array(nv * 3), uv = new Float32Array(nv * 2);
+  for (let j = 0; j < vh; j++) for (let i = 0; i < vw; i++) {
+    const k = j * vw + i;
+    pos[k * 3] = (i / sw - 0.5) * W; pos[k * 3 + 1] = (0.5 - j / sh) * H;
+    uv[k * 2] = i / sw; uv[k * 2 + 1] = 1 - j / sh;
+  }
+  const idx = new Uint16Array(sw * sh * 6); let q = 0;
+  for (let j = 0; j < sh; j++) for (let i = 0; i < sw; i++) {
+    const a = j * vw + i, b = a + 1, cc = a + vw, dd = cc + 1;
+    idx[q++] = a; idx[q++] = cc; idx[q++] = dd; idx[q++] = a; idx[q++] = dd; idx[q++] = b;
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  geo.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
+  geo.setIndex(new THREE.BufferAttribute(idx, 1));
+  const tc = document.createElement('canvas'); const ts = Math.min(1, 1024 / Math.max(bmp.width, bmp.height));
+  tc.width = Math.round(bmp.width * ts); tc.height = Math.round(bmp.height * ts);
+  tc.getContext('2d').drawImage(bmp, 0, 0, tc.width, tc.height);
+  const tex = new THREE.CanvasTexture(tc); tex.encoding = THREE.sRGBEncoding;
+  const mat = new THREE.MeshLambertMaterial({ map: tex, side: THREE.DoubleSide });
+  if (t.mesh) { t.group.remove(t.mesh); t.mesh.geometry.dispose(); t.mesh.material.map.dispose(); t.mesh.material.dispose(); }
+  t.mesh = new THREE.Mesh(geo, mat); t.group.add(t.mesh);
+  t.st = { sw, sh, vw, vh, nv, lum, col, idx };
+  t.rx = 0; t.ry = 0; t.dist = 4.4;
+  $('#empty3d').hidden = true; $('#v3d').hidden = false;
+  $('#wm3d').textContent = WM;
+  resize3D(); applyDepth();
+}
+function applyDepth() {
+  if (!T || !T.mesh) return;
+  const { lum, nv } = T.st, dep = +$('#depth').value, inv = $('#inv').checked;
+  const p = T.mesh.geometry.attributes.position;
+  for (let i = 0; i < nv; i++) p.array[i * 3 + 2] = (inv ? 1 - lum[i] : lum[i]) * dep;
+  p.needsUpdate = true; T.mesh.geometry.computeVertexNormals();
+}
+$('#depth').addEventListener('input', applyDepth);
+$('#inv').addEventListener('change', applyDepth);
+$('#auto').addEventListener('change', e => { if (T) T.auto = e.target.checked; });
+$('#snap').onclick = () => { if (!T) return; T.renderer.domElement.toBlob(b => b && download(b, 'walow-3d.png'), 'image/png'); };
+function exportMesh(kind) {
+  if (!T || !T.mesh) return;
+  const { nv, col, idx, vw } = T.st, p = T.mesh.geometry.attributes.position.array;
+  const head = 'Created by Walow Creator Studio - ' + OWNER + ' (c) 2026';
+  const out = [];
+  if (kind === 'ply') {
+    out.push('ply', 'format ascii 1.0', 'comment ' + head, 'element vertex ' + nv,
+      'property float x', 'property float y', 'property float z',
+      'property uchar red', 'property uchar green', 'property uchar blue',
+      'element face ' + (idx.length / 3), 'property list uchar int vertex_indices', 'end_header');
+    for (let i = 0; i < nv; i++) out.push(p[i * 3].toFixed(4) + ' ' + p[i * 3 + 1].toFixed(4) + ' ' + p[i * 3 + 2].toFixed(4) + ' ' +
+      Math.round(col[i * 3] * 255) + ' ' + Math.round(col[i * 3 + 1] * 255) + ' ' + Math.round(col[i * 3 + 2] * 255));
+    for (let i = 0; i < idx.length; i += 3) out.push('3 ' + idx[i] + ' ' + idx[i + 1] + ' ' + idx[i + 2]);
+  } else {
+    out.push('# ' + head);
+    for (let i = 0; i < nv; i++) out.push('v ' + p[i * 3].toFixed(4) + ' ' + p[i * 3 + 1].toFixed(4) + ' ' + p[i * 3 + 2].toFixed(4) + ' ' +
+      col[i * 3].toFixed(3) + ' ' + col[i * 3 + 1].toFixed(3) + ' ' + col[i * 3 + 2].toFixed(3));
+    for (let i = 0; i < idx.length; i += 3) out.push('f ' + (idx[i] + 1) + ' ' + (idx[i + 1] + 1) + ' ' + (idx[i + 2] + 1));
+  }
+  download(new Blob([out.join('\n')], { type: 'text/plain' }), 'walow-3d.' + kind);
+}
+$('#expPly').onclick = () => exportMesh('ply');
+$('#expObj').onclick = () => exportMesh('obj');
+
+/* ---------- فيديو سينمائي (يُصوَّر داخل الجهاز) ---------- */
+let lastVideo = null;
+async function renderVideo(item) {
+  const bmp = await createImageBitmap(item.raw), ar = bmp.width / bmp.height;
+  let W, H;
+  if (ar > 1.25) { W = 1280; H = 720; } else if (ar < 0.8) { W = 720; H = 1280; } else { W = 960; H = 960; }
+  if (typeof MediaRecorder === 'undefined') throw new Error('هذا المتصفح لا يدعم تسجيل الفيديو.');
+  const cv = $('#cvVid'); cv.width = W; cv.height = H;
+  cv.hidden = false; $('#vidDone').hidden = true; $('#emptyVid').hidden = true;
+  if (!cv.captureStream) throw new Error('هذا المتصفح لا يدعم تسجيل الفيديو.');
+  const ctx = cv.getContext('2d');
+  const dur = +$('#dur').value || 6, motion = $('#motion').value, vfx = $('#vfx').checked;
+  const k = Math.max(W / bmp.width, H / bmp.height), iw = bmp.width * k, ih = bmp.height * k;
+
+  const gr = document.createElement('canvas'); gr.width = gr.height = 256;
+  const gx = gr.getContext('2d'), gd = gx.createImageData(256, 256);
+  for (let i = 0; i < gd.data.length; i += 4) { const v = Math.random() * 255; gd.data[i] = gd.data[i + 1] = gd.data[i + 2] = v; gd.data[i + 3] = 255; }
+  gx.putImageData(gd, 0, 0);
+  const grain = ctx.createPattern(gr, 'repeat');
+  const vig = ctx.createRadialGradient(W / 2, H / 2, Math.min(W, H) * 0.3, W / 2, H / 2, Math.max(W, H) * 0.75);
+  vig.addColorStop(0, 'rgba(0,0,0,0)'); vig.addColorStop(1, 'rgba(0,0,0,.62)');
+  const parts = []; let burst = false;
+  const spawn = (x, y, vx, vy, life) => parts.push({ x, y, vx, vy, life, max: life });
+
+  function fx(t, p) {
+    ctx.fillStyle = vig; ctx.globalCompositeOperation = 'source-over'; ctx.fillRect(0, 0, W, H);
+    ctx.globalCompositeOperation = 'screen';
+    const lx = W * (0.15 + 0.7 * p), ly = H * 0.3, a = 0.16 + 0.08 * Math.sin(t * 3);
+    const lg = ctx.createRadialGradient(lx, ly, 0, lx, ly, W * 0.6);
+    lg.addColorStop(0, 'rgba(255,160,50,' + a + ')'); lg.addColorStop(1, 'rgba(255,160,50,0)');
+    ctx.fillStyle = lg; ctx.fillRect(0, 0, W, H);
+    const ft = dur * 0.55;
+    if (t >= ft && !burst) { burst = true; for (let i = 0; i < 90; i++) { const an = Math.random() * 6.283, sp = 3 + Math.random() * 11; spawn(W / 2, H / 2, Math.cos(an) * sp, Math.sin(an) * sp, 26 + Math.random() * 26); } }
+    if (t >= ft && t < ft + 0.28) { ctx.fillStyle = 'rgba(255,245,225,' + (0.6 * (1 - (t - ft) / 0.28)) + ')'; ctx.fillRect(0, 0, W, H); }
+    for (let i = 0; i < 2; i++) spawn(Math.random() * W, H + 6, (Math.random() - 0.5) * 1.2, -(1.5 + Math.random() * 2.5), 60 + Math.random() * 40);
+    ctx.globalCompositeOperation = 'lighter';
+    for (let i = parts.length - 1; i >= 0; i--) {
+      const q = parts[i]; q.x += q.vx; q.y += q.vy; q.vx *= 0.985; q.life--;
+      if (q.life <= 0) { parts.splice(i, 1); continue; }
+      const al = q.life / q.max, r = 1.5 + 2.2 * al;
+      ctx.fillStyle = 'rgba(255,' + Math.round(130 + 90 * al) + ',50,' + al + ')';
+      ctx.beginPath(); ctx.arc(q.x, q.y, r * (W / 1000 + 0.5), 0, 6.283); ctx.fill();
+    }
+    ctx.globalCompositeOperation = 'overlay'; ctx.globalAlpha = 0.16;
+    ctx.save(); ctx.translate(-Math.random() * 256, -Math.random() * 256);
+    ctx.fillStyle = grain; ctx.fillRect(0, 0, W + 256, H + 256); ctx.restore();
+    ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
+    if (W > H) { const bh = Math.round(H * 0.065); ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, bh); ctx.fillRect(0, H - bh, W, bh); }
+  }
+  function draw(t) {
+    const p = t / dur, e = p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
+    let s = 1.08, dx = 0, dy = 0, rot = 0;
+    if (motion === 'in') s = 1.04 + 0.26 * e;
+    else if (motion === 'out') s = 1.3 - 0.26 * e;
+    else if (motion === 'right') { s = 1.22; dx = (-0.5 + e) * W * 0.16; }
+    else if (motion === 'left') { s = 1.22; dx = (0.5 - e) * W * 0.16; }
+    else if (motion === 'orbit') { s = 1.14 + 0.1 * e; dx = Math.sin(p * 6.283) * W * 0.035; dy = Math.cos(p * 6.283) * H * 0.015; rot = Math.sin(p * 6.283) * 0.018; }
+    else if (motion === 'shake') { s = 1.12 + 0.1 * e; dx = (Math.random() - 0.5) * W * 0.012; dy = (Math.random() - 0.5) * H * 0.012; rot = (Math.random() - 0.5) * 0.01; }
+    ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
+    ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H);
+    ctx.save();
+    if (vfx) ctx.filter = 'contrast(1.12) saturate(1.2) brightness(1.02)';
+    ctx.translate(W / 2 + dx, H / 2 + dy); ctx.rotate(rot); ctx.scale(s, s);
+    ctx.drawImage(bmp, -iw / 2, -ih / 2, iw, ih);
+    ctx.restore();
+    if (vfx) fx(t, p);
+    const f = Math.min(1, t / 0.4, (dur - t) / 0.4);
+    if (f < 1) { ctx.fillStyle = 'rgba(0,0,0,' + (1 - Math.max(0, f)) + ')'; ctx.fillRect(0, 0, W, H); }
+    stampCtx(ctx, W, H);
+  }
+
+  const mime = ['video/mp4;codecs=avc1.42E01E', 'video/mp4', 'video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm']
+    .find(m => MediaRecorder.isTypeSupported(m)) || '';
+  const rec = new MediaRecorder(cv.captureStream(30), mime ? { mimeType: mime, videoBitsPerSecond: 5e6 } : { videoBitsPerSecond: 5e6 });
+  const chunks = []; rec.ondataavailable = ev => { if (ev.data && ev.data.size) chunks.push(ev.data); };
+  const stopped = new Promise(r => { rec.onstop = r; });
+  draw(0); rec.start(250);
+  const t0 = performance.now();
+  await new Promise(resolve => {
+    const step = now => {
+      if (cancelFlag) { resolve(); return; }
+      const t = Math.min((now - t0) / 1000, dur);
+      draw(t); setStatus('جاري التصوير… ' + Math.round(t / dur * 100) + '% (لا تغلق الصفحة)');
+      if (t >= dur) resolve(); else requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  });
+  rec.stop(); await stopped;
+  if (cancelFlag) { cv.hidden = true; throw new Error('cancel'); }
+  const type = (rec.mimeType || mime || 'video/webm').split(';')[0];
+  const blob = new Blob(chunks, { type });
+  if (lastVideo) URL.revokeObjectURL(lastVideo.url);
+  lastVideo = { blob, url: URL.createObjectURL(blob), ext: /mp4/.test(type) ? 'mp4' : 'webm' };
+  cv.hidden = true;
+  const v = $('#vidOut'); v.src = lastVideo.url; $('#vidDone').hidden = false;
+}
+$('#vidDl').onclick = () => { if (lastVideo) download(lastVideo.blob, 'walow-video.' + lastVideo.ext); };
+
+/* ---------- تشغيل ---------- */
+function toggleBusy(b) { $('#go').disabled = b; $('#cancel').hidden = !b; }
+$('#cancel').onclick = () => { cancelFlag = true; if (ctl) ctl.abort(); };
+async function run() {
+  if (busy) return;
+  busy = true; cancelFlag = false; ctl = new AbortController(); toggleBusy(true); setStatus('');
+  try {
+    const prompt = $('#prompt').value.trim(), vfx = $('#vfx').checked;
+    const o = { ratio: $('#ratio').value, style: $('#style').value, vfx };
+    if (tab === 'img') {
+      if (!prompt) { setStatus('اكتب وصف الصورة أولاً.', true); return; }
+      const n = clamp(parseInt($('#count').value, 10) || 1, 1, 50);
+      for (let i = 0; i < n; i++) {
+        if (cancelFlag) break;
+        setStatus('جاري توليد الصورة ' + (i + 1) + ' من ' + n + '…');
+        await genImage(prompt, o);
+        if (i < n - 1) await sleep(1200);
+      }
+      setStatus(cancelFlag ? 'تم الإيقاف.' : 'تم التوليد.');
+    } else {
+      let item = sel[tab];
+      if (!item) {
+        if (!prompt) { setStatus('اكتب وصفاً، أو اختر صورة، أو ارفع صورة أولاً.', true); return; }
+        setStatus('جاري توليد الصورة المصدر…');
+        item = await genImage(prompt, Object.assign(o, { ratio: tab === 'vid' ? '16:9' : '1:1' }));
+        sel[tab] = item; renderStrip();
+      }
+      if (tab === '3d') { setStatus('جاري بناء المجسّم…'); await build3D(item); setStatus('تم. دوّر المجسّم بإصبعك.'); }
+      else { await renderVideo(item); setStatus('تم تصوير الفيديو.'); }
+    }
+  } catch (e) { setStatus(niceErr(e), cancelFlag ? false : true); }
+  finally { busy = false; toggleBusy(false); }
+}
+$('#go').onclick = run;
+
+/* ---------- حماية بصمة الحقوق ---------- */
+function ensureCopy() {
+  const f = $('#copy');
+  if (f && f.textContent.includes(OWNER) && !f.hidden && f.offsetParent !== null) return;
+  if (f) f.remove();
+  const p = document.createElement('p'); p.id = 'copy';
+  p.innerHTML = 'صُنع وبُرمج بواسطة <b></b> - جميع الحقوق محفوظة © 2026';
+  p.querySelector('b').textContent = OWNER;
+  ($('.wrap') || document.body).appendChild(p);
+}
+setInterval(ensureCopy, 3000);
+
+switchTab('img');
+renderGallery();
+})();
+</script>
+</body>
+</html>
