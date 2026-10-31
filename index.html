@@ -308,6 +308,7 @@ function setStatus(msg, err) { const s = $('#status'); s.textContent = msg || ''
 function niceErr(e) {
   if (cancelFlag || e.message === 'cancel') return 'تم الإيقاف.';
   if (e.name === 'AbortError') return 'انتهت مهلة الاتصال بالخدمة. أعد المحاولة.';
+  if (e.status === 402) return 'الخدمة المجانية طلبت دفعاً لهذا الطلب. أعد المحاولة بعد قليل أو جرّب وصفاً مختلفاً.';
   if (e.status === 429) return 'الخدمة المجانية مشغولة حالياً. انتظر دقيقة ثم أعد المحاولة.';
   if (e.status === 401 || e.status === 403) return 'الخدمة رفضت هذا الطلب. جرّب وصفاً مختلفاً أو أعد المحاولة لاحقاً.';
   if (e instanceof TypeError) return 'تعذّر الاتصال بالإنترنت أو بالخدمة.';
@@ -388,16 +389,47 @@ async function genImage(prompt, o) {
   const en = await toEnglish(prompt);
   const [w, h] = SIZES[o.ratio] || SIZES['1:1'];
   const full = en + (STYLES[o.style] || '') + (o.vfx ? VFXP : '');
+  const rnd = () => Math.floor(Math.random() * 1e9);
+  const base = 'https://image.pollinations.ai/prompt/' + encodeURIComponent(full) + '?width=' + w + '&height=' + h;
+  const variants = [
+    () => base + '&seed=' + rnd() + '&referrer=walow-studio',
+    () => base + '&seed=' + rnd() + '&model=turbo&referrer=walow-studio',
+    () => base + '&seed=' + rnd() + '&nologo=true&model=flux&referrer=walow-studio'
+  ];
   let blob, last;
-  for (let a = 0; a < 3 && !blob; a++) {
-    if (cancelFlag) throw new Error('cancel');
-    const seed = Math.floor(Math.random() * 1e9);
-    const url = 'https://image.pollinations.ai/prompt/' + encodeURIComponent(full) +
-      '?width=' + w + '&height=' + h + '&seed=' + seed + '&nologo=true&model=flux';
-    try { blob = await fetchBlob(url); } catch (e) { last = e; if (cancelFlag) throw e; await sleep(2500 * (a + 1)); }
+  for (let v = 0; v < variants.length && !blob; v++) {
+    for (let a = 0; a < 2 && !blob; a++) {
+      if (cancelFlag) throw new Error('cancel');
+      try { blob = await fetchBlob(variants[v]()); }
+      catch (e) {
+        last = e; if (cancelFlag) throw e;
+        if (e.status === 402 || e.status === 401 || e.status === 403) break;
+        await sleep(e.status === 429 ? 16000 : 4000);
+      }
+    }
   }
+  if (!blob) { try { blob = await puterImage(full); } catch (e) { if (cancelFlag) throw e; last = last || e; } }
   if (!blob) throw last || new Error('فشل التوليد.');
   return addItem(blob, prompt);
+}
+let puterP = null;
+function loadPuter() {
+  if (typeof puter !== 'undefined') return Promise.resolve();
+  if (!puterP) puterP = new Promise((res, rej) => {
+    const s = document.createElement('script'); s.src = 'https://js.puter.com/v2/';
+    s.onload = res; s.onerror = () => { puterP = null; rej(new Error('تعذّر تحميل الخدمة البديلة.')); };
+    document.head.appendChild(s);
+  });
+  return puterP;
+}
+async function puterImage(prompt) {
+  await loadPuter();
+  setStatus('الخدمة الأولى غير متاحة الآن. جاري استخدام خدمة بديلة (قد تطلب تسجيل دخول مجاني في Puter)…');
+  const img = await puter.ai.txt2img(prompt);
+  const r = await fetch(img.src);
+  const b = await r.blob();
+  if (!/^image\//.test(b.type)) throw new Error('رد غير صالح من الخدمة البديلة.');
+  return b;
 }
 
 /* ---------- المعرض والمصادر ---------- */
@@ -703,7 +735,7 @@ async function run() {
         if (cancelFlag) break;
         setStatus('جاري توليد الصورة ' + (i + 1) + ' من ' + n + '…');
         await genImage(prompt, o);
-        if (i < n - 1) await sleep(1200);
+        if (i < n - 1 && !cancelFlag) { setStatus('انتظار 16 ثانية بين الصور بسبب حدود الخدمة المجانية…'); await sleep(16000); }
       }
       setStatus(cancelFlag ? 'تم الإيقاف.' : 'تم التوليد.');
     } else {
